@@ -40,6 +40,11 @@ export function activate(context: vscode.ExtensionContext) {
                 // Display the response in a new webview panel
                 displayApiResponse(response);
                 
+                // Run the generated commands in the terminal
+                const terminal = vscode.window.createTerminal('Project Setup');
+                terminal.sendText(response);
+                terminal.show();
+
                 vscode.window.showInformationMessage('Project setup complete!');
             } catch (error: any) {
                 vscode.window.showErrorMessage(`Failed to set up the project: ${error.message}`);
@@ -63,28 +68,8 @@ function displayApiResponse(response: string): void {
     outputChannel.show(true);
 }
 
-
-function getWebviewContent(response: string): string {
-    return `
-        <!DOCTYPE html>
-        <html lang="en">
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>API Response</title>
-        </head>
-        <body>
-            <pre>${response}</pre>
-        </body>
-        </html>
-    `;
-}
-
-
-export function deactivate() {}
-
 async function generateSetupCommands(apiKey: string, projectDescription: string): Promise<string> {
-    const openaiApiEndpoint = 'https://api.openai.com/v1/engines/davinci/completions';
+    const openaiApiEndpoint = 'https://api.openai.com/v1/completions';
     const prompt = `Understand the user prompt and give ONLY terminal package installation codes. ${projectDescription}`;
 
     try {
@@ -92,6 +77,7 @@ async function generateSetupCommands(apiKey: string, projectDescription: string)
             openaiApiEndpoint,
             {
                 prompt,
+                model:"text-davinci-003",
                 max_tokens: 400,
             },
             {
@@ -112,3 +98,5 @@ async function generateSetupCommands(apiKey: string, projectDescription: string)
         throw new Error(`Failed to generate setup commands from OpenAI API: ${error.message}`);
     }
 }
+
+export function deactivate() {}
