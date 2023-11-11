@@ -1,7 +1,12 @@
 # revflow-ai README
 
 This is the README for your extension "revflow-ai". After writing up a brief description, we recommend including the following sections.
-
+Problem Statement which we are focussing on 
+```
+Challenge 1: Next-Gen Developer Tools
+Create groundbreaking developer tools that harness the power of AI to automate coding tasks, identify
+and rectify errors, conduct code refinements, optimize performance, and streamline the software development workflow.
+```
 ## Features
 
 Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
