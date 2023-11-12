@@ -39,10 +39,18 @@ export function activate(context: vscode.ExtensionContext) {
 
                 // Display the response in a new webview panel
                 displayApiResponse(response);
+
+                const lines = response.split('\n');
+
+                // Use regular expressions to filter out lines that seem to be commands
+                const commandLines = lines.filter(line => /^(\d+\.|')?\s*([^\s']+)/.test(line));
+                // Join the command lines into a single string
+                const commandString = commandLines.join('\n');
+
                 
                 // Run the generated commands in the terminal
                 const terminal = vscode.window.createTerminal('Project Setup');
-                terminal.sendText(response);
+                terminal.sendText(commandString);
                 terminal.show();
 
                 vscode.window.showInformationMessage('Project setup complete!');
