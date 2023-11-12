@@ -31,14 +31,16 @@ const extensionConfig = {
     rules: [
       {
         test: /\.ts$/,
+        loader: 'ts-loader',
+        options: {
+          compilerOptions: {
+            esModuleInterop: true,
+          },
+        },
         exclude: /node_modules/,
-        use: [
-          {
-            loader: 'ts-loader'
-          }
-        ]
-      }
-    ]
+      },
+      // other rules...
+    ],
   },
   devtool: 'nosources-source-map',
   infrastructureLogging: {

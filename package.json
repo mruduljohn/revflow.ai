@@ -22,7 +22,7 @@
         "title": "revflow.ai"
       },
       {
-        "command":"extension.clearResponseHistory",
+        "command": "extension.clearResponseHistory",
         "title": "Clear revflow history"
       },
       {
@@ -43,7 +43,7 @@
     "test": "node ./out/test/runTest.js"
   },
   "devDependencies": {
-    "@types/mocha": "^10.0.3",
+    "@types/mocha": "^10.0.4",
     "@types/node": "18.x",
     "@types/vscode": "^1.84.0",
     "@typescript-eslint/eslint-plugin": "^6.9.0",
