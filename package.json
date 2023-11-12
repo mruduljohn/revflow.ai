@@ -3,6 +3,7 @@
   "displayName": "revflow.ai",
   "description": "hello reverend",
   "version": "0.0.1",
+  "publisher":"reverend",
   "engines": {
     "vscode": "^1.84.0"
   },
