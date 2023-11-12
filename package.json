@@ -1,8 +1,9 @@
 {
   "name": "revflow-ai",
   "displayName": "revflow.ai",
-  "description": "hello reverend",
-  "version": "0.0.1",
+  "description": "Built at TinkHack 23",
+  "icon": "images/reverendlogo.png",
+  "version": "1.0.0",
   "publisher":"reverend",
   "engines": {
     "vscode": "^1.84.0"
