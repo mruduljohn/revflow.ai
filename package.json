@@ -6,6 +6,10 @@
   "engines": {
     "vscode": "^1.84.0"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mruduljohn/revflow.ai.git"
+  },
   "categories": [
     "Other"
   ],

@@ -29,7 +29,7 @@ RevFlow-AI contributes the following settings:
 
 ## Known Issues
 
-No known issues at the moment. Please report any problems on our [GitHub repository](https://github.com/mruduljohn/revflow-ai).
+No known issues at the moment. Please report any problems on our [GitHub repository](https://github.com/mruduljohn/revflow.ai).
 
 ## Release Notes
 
