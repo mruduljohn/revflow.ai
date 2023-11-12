@@ -22,6 +22,10 @@
         "title": "revflow.ai"
       },
       {
+        "command":"extension.clearResponseHistory",
+        "title": "Clear revflow history"
+      },
+      {
         "command": "revflow.ai-react",
         "title": "revflow.ai-react"
       }

@@ -2,7 +2,16 @@ import * as vscode from 'vscode';
 import { exec } from 'child_process';
 import axios from 'axios';
 
+// Define a type for response history entries
+interface ResponseHistoryEntry {
+    timestamp: number;
+    response: string;
+}
+
 export function activate(context: vscode.ExtensionContext) {
+    // Initialize or retrieve the response history from the global state
+    let responseHistory: ResponseHistoryEntry[] = context.globalState.get('responseHistory') || [];
+
     let disposable = vscode.commands.registerCommand('extension.configureAndSetupProject', async () => {
         // Check if API key is already stored in global state
         let openaiApiKey = context.globalState.get<string>('openaiApiKey');
@@ -30,12 +39,18 @@ export function activate(context: vscode.ExtensionContext) {
         });
 
         if (userPrompt) {
-            const customPrompt = `The following is the user prompt. You should give the complete code a noob needs to execute line by line:  "${userPrompt}"`;
+            const customPrompt = `The following is the user prompt. You should give the complete code a noob needs to execute line by line,THERE SHOULD NOT BE ANY OTHER CHARACTER BEFORE COMMANDS IN EACH LINE:  "${userPrompt}"`;
             try {
-                const response = await generateSetupCommands(openaiApiKey, customPrompt);
+                const response = await generateSetupCommands(openaiApiKey, customPrompt, responseHistory);
 
-                // Save the response to global state
-                context.globalState.update('apiResponse', response);
+                // Save the response to response history with a timestamp
+                const timestamp = Date.now();
+                responseHistory.push({ timestamp, response });
+                
+                // Limit the response history to the last two entries
+                responseHistory = responseHistory.slice(-2);
+
+                context.globalState.update('responseHistory', responseHistory);
 
                 // Display the response in a new webview panel
                 displayApiResponse(response);
@@ -43,11 +58,13 @@ export function activate(context: vscode.ExtensionContext) {
                 const lines = response.split('\n');
 
                 // Use regular expressions to filter out lines that seem to be commands
-                const commandLines = lines.filter(line => /^(\d+\.|')?\s*([^\s']+)/.test(line));
+                const commandLines = lines
+                .map(line => line.replace(/^\s*\d+[.)]\s*/, '')) // Remove leading numbers with dot or parenthesis
+                .filter(line => line.trim() !== ''); // Filter out empty lines after removal
+
                 // Join the command lines into a single string
                 const commandString = commandLines.join('\n');
 
-                
                 // Run the generated commands in the terminal
                 const terminal = vscode.window.createTerminal('Project Setup');
                 terminal.sendText(commandString);
@@ -62,7 +79,14 @@ export function activate(context: vscode.ExtensionContext) {
         }
     });
 
-    context.subscriptions.push(disposable);
+    // Add a command to clear the response history
+    let clearHistoryDisposable = vscode.commands.registerCommand('extension.clearResponseHistory', () => {
+        responseHistory = [];
+        context.globalState.update('responseHistory', responseHistory);
+        vscode.window.showInformationMessage('Response history cleared.');
+    });
+
+    context.subscriptions.push(disposable,clearHistoryDisposable);
 }
 
 function displayApiResponse(response: string): void {
@@ -76,15 +100,19 @@ function displayApiResponse(response: string): void {
     outputChannel.show(true);
 }
 
-async function generateSetupCommands(apiKey: string, projectDescription: string): Promise<string> {
+async function generateSetupCommands(apiKey: string, projectDescription: string, responseHistory: ResponseHistoryEntry[]): Promise<string> {
     const openaiApiEndpoint = 'https://api.openai.com/v1/completions';
     const prompt = `Understand the user prompt and give ONLY terminal package installation codes. ${projectDescription}`;
+    
+    // Combine the current prompt with the context from response history
+    const context = responseHistory.map(entry => entry.response).join('\n');
+    const combinedPrompt = `${prompt}\n\nPrevious responses:\n${context}`;
 
     try {
         const response = await axios.post(
             openaiApiEndpoint,
             {
-                prompt,
+                prompt: combinedPrompt,
                 model:"text-davinci-003",
                 max_tokens: 400,
             },
